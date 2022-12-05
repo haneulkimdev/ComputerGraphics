@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Programming Assignment 1</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        background-color: #000;
+        color: #fff;
+        font-family: Monospace;
+        font-size: 13px;
+        line-height: 24px;
+      }
+
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        z-index: 100;
+        display: block;
+      }
+
+      b {
+        color: lightgreen;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container"></div>
+    <div id="info">
+      Programming Assignment 1 <br />
+      <b>1</b> Move your object (cube) <b>2</b> Move your camera
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../node_modules/three/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script type="module" src="./practice.js"></script>
+  </body>
+</html>
