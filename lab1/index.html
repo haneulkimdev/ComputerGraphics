@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CG Practice 1</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <style>
+      body {
+        background-color: #bfe3dd;
+        color: #000;
+      }
+
+      a {
+        color: #2983ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="myContainer"></div>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../node_modules/three/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(640, 480);
+      renderer.setViewport(320, 0, 640, 480);
+
+      const container = document.getElementById("myContainer");
+
+      container.appendChild(renderer.domElement);
+
+      // camera setting
+      const camera = new THREE.PerspectiveCamera(45, 640.0 / 480.0, 1, 500);
+      camera.position.set(0, 0, -100);
+      camera.up.set(0, -1, 0);
+      camera.lookAt(0, 0, 50);
+
+      // geometry setting
+      const points = [];
+      points.push(new THREE.Vector3(-10, 0, 0));
+      points.push(new THREE.Vector3(0, 10, 0));
+      points.push(new THREE.Vector3(10, 0, 0));
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      // material setting
+      const material = new THREE.LineBasicMaterial({ color: 0xffff00 });
+
+      // line model
+      const myLine = new THREE.Line(geometry, material);
+
+      // create my world (scene)
+      const myScene = new THREE.Scene();
+
+      myScene.add(myLine);
+
+      renderer.render(myScene, camera);
+    </script>
+  </body>
+</html>
