@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CG Practice 6</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <style>
+      body {
+        background-color: #bfe3dd;
+        color: #000;
+      }
+
+      a {
+        color: #2983ff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring
+      <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a>
+    </div>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+      varying vec2 vUv;
+
+      void main() {
+        vUv = uv;
+
+        // attribute vec3 position;
+        gl_Position = vec4(position.xyz, 1.0);
+      }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+      varying vec2 vUv;
+
+      uniform float time;
+
+      uniform sampler2D myTexImg;
+      uniform vec2 imgSize;
+
+      uniform vec2 bufferSize;
+
+      float RGB2Gray(vec3 color) {
+        float minColor = min(min(color.r, color.b), color.b);
+        float maxColor = max(max(color.r, color.b), color.b);
+        return (minColor + maxColor) * 0.5;
+      }
+
+      void main() {
+        // vec2 p = - 1.0 + 2.0 * vUv;
+        // float a = time * 40.0;
+        vec3 imgRGB = vec3(0, 0, 0);
+        if (imgSize.x != 0.0) {
+          // imgRGB = texture2D(myTexImg, vec2(gl_FragCoord.x / imgSize.x, gl_FragCoord.y / imgSize.y)).rgb;
+          vec2 uv = gl_FragCoord.xy / imgSize.xy;
+          vec2 offset = 1.0 / imgSize.xy;
+          if (uv.x <= 1.0 && uv.x >= 0.0 && uv.y <= 1.0 && uv.y >= 0.0) {
+            float gray0 = RGB2Gray(texture2D(myTexImg, uv + vec2(-offset.x, offset.y)).rgb);
+            float gray1 = RGB2Gray(texture2D(myTexImg, uv + vec2(-offset.x, 0)).rgb);
+            float gray2 = RGB2Gray(texture2D(myTexImg, uv + vec2(-offset.x, -offset.y)).rgb);
+            float gray3 = RGB2Gray(texture2D(myTexImg, uv + vec2(offset.x, offset.y)).rgb);
+            float gray4 = RGB2Gray(texture2D(myTexImg, uv + vec2(offset.x, 0)).rgb);
+            float gray5 = RGB2Gray(texture2D(myTexImg, uv + vec2(offset.x, -offset.y)).rgb);
+
+            float sobel = gray0 * (-1.0) + gray1 * (-2.0) + gray2 * (-1.0) + gray3 + gray4 * 2.0 + gray5;
+
+            // imgRGB += texture2D(myTexImg, uv + vec2(offset.x, offset.y)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(offset.x, 0)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(offset.x, -offset.y)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(0, offset.y)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(0, 0)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(0, -offset.y)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(-offset.x, offset.y)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(-offset.x, 0)).rgb;
+            // imgRGB += texture2D(myTexImg, uv + vec2(-offset.x, -offset.y)).rgb;
+            // imgRGB /= 9.0;
+            // imgRGB = vec3(sobel);
+          }
+        } else
+          imgRGB = texture2D(myTexImg, vUv).rgb;
+
+        gl_FragColor = vec4(imgRGB, 1.0);
+
+        vec2 uv = gl_FragCoord.xy / imgSize.xy;
+        gl_FragColor = vec4(texture2D(myTexImg, uv).rgb, 1.0);
+      }
+    </script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../node_modules/three/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script type="module" src="./practice6.js"></script>
+  </body>
+</html>
