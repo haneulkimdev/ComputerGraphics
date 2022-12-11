@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Programming Assignment 3</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        background-color: #000;
+        color: #fff;
+        font-family: Monospace;
+        font-size: 13px;
+        line-height: 24px;
+      }
+
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        z-index: 100;
+        display: block;
+      }
+
+      b {
+        color: lightgreen;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="myContainer"></div>
+    <div id="info">
+      Programming Assignment 3 <br />
+      <b>1</b> Move your object (cube) <b>2</b> Move your camera
+    </div>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "../node_modules/three/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+      precision mediump float;
+      precision mediump int;
+
+      // Assignment TO DO //
+      // get your model matrix
+      uniform mat4 modelMatrix1;
+      uniform mat4 modelMatrix2;
+      uniform mat4 modelViewMatrix;
+      uniform mat4 projectionMatrix;
+
+      attribute vec3 position;
+      attribute vec3 normal;
+
+      varying vec3 vPosition;
+      varying vec3 vNormal;
+
+      void main() {
+        // Assignment TO DO //
+        // choose your lighting space (world or camera space)
+        // transform position and normal accordingly
+
+        vec4 posWS = modelMatrix1 * vec4(position, 1.0);
+        vPosition = posWS.xyz / posWS.w;
+        vec4 normalWS = modelMatrix2 * vec4(normal, 0.0);
+        vNormal = normalWS.xyz;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragment">
+      #define X_PI 3.14159265358979323846
+
+      precision mediump float;
+      precision mediump int;
+
+      uniform sampler2D envMap;
+      // Assignment TO DO //
+      uniform vec3 posLight;       // get Point Light position
+      uniform vec3 lightColor;     // get Point Light color
+      uniform vec3 ambLightColor;  // get Amient Light color
+      uniform vec3 posEye;         // get Camera position
+      uniform vec3 materialColor;  // get Material color
+      uniform float shininess;     // get Shininess factor
+
+      // Assignment TO DO //
+      // get necessary attributes (interpolated)
+      varying vec3 vPosition;
+      varying vec3 vNormal;
+
+      void main() {
+        // compute Phong Lighting
+
+        vec3 L = normalize(posLight - vPosition);     // normalized vector pointing towards light source
+        vec3 N = normalize(vNormal);                  // normalized surface normal
+        vec3 V = normalize(posEye - vPosition);       // normalized vector pointing towards viewer
+        vec3 R = normalize(2.0 * dot(N, V) * N - V);  // normalized reflection on surface
+
+        // compute diffuse term
+        float diffuseFactor = max(dot(L, N), 0.0);
+
+        // compute reflection term
+        float reflectionFactor = pow(max(dot(R, L), 0.0), shininess);
+
+        // compute env map's uv and sample
+        float u = (atan(R.x / R.z) + X_PI) / (2.0 * X_PI);
+        float v = (asin(R.y) + X_PI / 2.0) / (X_PI);
+
+        vec3 colorEnv = texture2D(envMap, vec2(u, v)).rgb;
+
+        // set output color
+        gl_FragColor.rgb = materialColor * ambLightColor + materialColor * lightColor * diffuseFactor + materialColor * colorEnv * reflectionFactor;
+      }
+    </script>
+
+    <script type="module" src="./practice.js"></script>
+  </body>
+</html>
